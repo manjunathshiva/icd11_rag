@@ -39,13 +39,14 @@ from llama_index.core import Settings
 from llama_index.core import StorageContext
 import qdrant_client
 
-# Create a local Qdrant vector store
-client = qdrant_client.QdrantClient(path="financialnews")
-vector_store = QdrantVectorStore(client=client, collection_name="collection")
+QDRANT_API_KEY = os.environ['QDRANT_API_KEY']
+# Create a cloud Qdrant vector store
+#client = qdrant_client.QdrantClient(path="financialnews")
+client = qdrant_client.QdrantClient(url="https://32ba6540-26df-48e3-a76b-7d831073402f.us-east4-0.gcp.cloud.qdrant.io", api_key=QDRANT_API_KEY)
+vector_store = QdrantVectorStore(client=client, collection_name="icd11")
 
 import os
-GOOGLE_API_KEY = "your-api-key" # add your GOOGLE API key here
-os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
+GOOGLE_API_KEY = os.environ['GOOGLE_API_KEY']
 
 
 from llama_index.embeddings.fastembed import FastEmbedEmbedding
@@ -59,7 +60,7 @@ for node in nodes:
 
 from llama_index.llms.gemini import Gemini
 Settings.embed_model = embed_model
-Settings.llm = Gemini(model="models/gemini-pro")
+Settings.llm = Gemini(model="models/gemini-1.5-flash")
 Settings.transformations = [SentenceSplitter(chunk_size=1024)]
 storage_context = StorageContext.from_defaults(vector_store=vector_store)
 index = VectorStoreIndex(
